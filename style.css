@@ -1,0 +1,32 @@
+body{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+}
+
+#header{
+    height: 50px;
+    background-color: aliceblue;
+    padding-top: 25px;
+    width: 100%;
+}
+
+#game_feeld{
+    margin-top: 10px;
+    background-color: wheat;
+    width: 555px;
+    flex-wrap: wrap;
+    display: flex;
+    height: 555px;
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
+.game_pole{
+    height:180px;
+    width:180px;
+    background-color: honeydew;
+    margin-bottom: 5px;
+    margin-right: 5px;  
+}
