@@ -40,6 +40,9 @@ const boardModule = (() => {
 
 const startModule = (() => {
     const startButtton = document.querySelector('#start_button');
+    
+    PubSub.subscribe('gameEnd',prepareNewGame);
+
     startButtton.addEventListener('click', () => {
 
         const chosePole = document.createElement('div');
@@ -69,6 +72,10 @@ const startModule = (() => {
             PubSub.publish('FirstPlayer','O')
         });
     });
+
+    function prepareNewGame () {
+        //make logic
+    }
 })();
 
 const playerModule = (() => {
@@ -77,12 +84,24 @@ const playerModule = (() => {
     PubSub.subscribe('FirstPlayer',game);
 
     function game(data){
-        boardModule.squers.forEach( squre => squre.addEventListener('click',operate(squre)))
+        boardModule.squers.forEach( squre => squre.addEventListener('click',operate))
+        if(data == 'X'){
+            document.querySelector("#Player1").textContent = 'Player1 - X';
+            document.querySelector("#Player2").textContent = 'Player2 - O';
+            document.querySelector('#result_feeld').textContent = 'Player1 turn';
+        }else{
+            document.querySelector("#Player1").textContent = 'Player1 - O';
+            document.querySelector("#Player2").textContent = 'Player2 - X';
+            document.querySelector('#result_feeld').textContent = 'Player2 turn';
+        }
+
+        function operate(squre) {
+            
+        }
     }
     
-    function operate(squre) {
-        
-    }
+
+   
     
 
 
@@ -96,7 +115,12 @@ const playerModule = (() => {
 
 const regulatorModule = (() => {
     //check winer and display result  
-    
+    PubSub.subscribe('WinnerChek',checkResult);
+
+    function checkResult() {
+        //add logic
+    }
+
     return {
         
     };
