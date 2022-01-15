@@ -22,9 +22,8 @@ const PubSub = (() => {
         events : Events
     };
 })();
-
+//adaptirovat board pod PubSub!!!
 const boardModule = (() => {
-    //controle game board
     const gamePole = document.querySelector("#game_feeld")
     const gameSquers = [];
     for (let i = 0; i < 9; i++){
@@ -38,7 +37,7 @@ const boardModule = (() => {
     };
 })();
 
-const startModule = (() => {
+const startEndModule = (() => {
     const startButtton = document.querySelector('#start_button');
     
     PubSub.subscribe('gameEnd',prepareNewGame);
@@ -71,54 +70,87 @@ const startModule = (() => {
             chosePole.remove();
             PubSub.publish('FirstPlayer','O')
         });
+
+        startButtton.remove();
     });
 
-    function prepareNewGame () {
+    function prepareNewGame (data) {
+        console.log(data);
         //make logic
+        //get Winner
     }
 })();
 
 const playerModule = (() => {
     // take eye on player`s turns and start game 
     
-    PubSub.subscribe('FirstPlayer',game);
+    // PubSub.publish("gameEnd",???);
 
-    function game(data){
-        boardModule.squers.forEach( squre => squre.addEventListener('click',operate))
+    PubSub.subscribe('FirstPlayer',game);
+    let firstPlayer = '';
+    let currentTurn = 'X';
+    let resF =  document.querySelector('#result_feeld');
+    function game(data) {
         if(data == 'X'){
             document.querySelector("#Player1").textContent = 'Player1 - X';
             document.querySelector("#Player2").textContent = 'Player2 - O';
-            document.querySelector('#result_feeld').textContent = 'Player1 turn';
+            resF.textContent = 'Player1 turn';
+            firstPlayer = 'X';
         }else{
             document.querySelector("#Player1").textContent = 'Player1 - O';
             document.querySelector("#Player2").textContent = 'Player2 - X';
-            document.querySelector('#result_feeld').textContent = 'Player2 turn';
-        }
-
-        function operate(squre) {
-            
+            resF.textContent = 'Player2 turn';
+            firstPlayer = 'O';
         }
     }
     
-
-   
+    boardModule.squers.forEach( squre => squre.addEventListener('click',operate))
     
-
-
-   
-
-
-    return {
-        
-    };
+    function operate(squre) {
+        if(squre.target.innerText == ''){
+            if(currentTurn == 'X'){
+                squre.target.innerText = 'X';
+                currentTurn = 'O';
+                if(firstPlayer == 'O'){
+                    resF.textContent = 'Player1 turn';
+                }else{
+                    resF.textContent = 'Player2 turn';
+                }
+            }else{
+                squre.target.innerText = 'O';
+                currentTurn = 'X';
+                if(firstPlayer == 'O'){
+                    resF.textContent = 'Player2 turn';
+                }else{
+                    resF.textContent = 'Player1 turn';
+                }
+                
+            }
+        }
+        PubSub.publish('WinnerChek', boardModule.squers)
+    }
 })();
 
 const regulatorModule = (() => {
     //check winer and display result  
     PubSub.subscribe('WinnerChek',checkResult);
+    PubSub.subscribe('FirstPlayer',saveFP);
+    let FP = '';
+    function saveFP(data){
+        FP = data;
+    }
 
-    function checkResult() {
-        //add logic
+    let checkArr = [];
+
+    function checkResult(data) {
+       for(let i = 0; i < 9; i++){
+            checkArr[i] = data[i].textContent
+       }
+       
+       if(checkArr[0] == checkArr[1] && checkArr[1] == checkArr[2] && checkArr[2] == checkArr[0]){
+           console.log(checkArr[0])
+            PubSub.publish('gameEnd', checkArr[1] == FP ? FP : '?');
+       }
     }
 
     return {
