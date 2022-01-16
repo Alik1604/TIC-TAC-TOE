@@ -44,10 +44,11 @@ body{
 
 #result_feeld{
     width: 100%;
-    height: 100px;
+    height: 50px;
     background-color: #65b2c6;
     position: absolute;
     bottom: 0px;
+    padding-top: 50px;
 }
 
 #start_button{

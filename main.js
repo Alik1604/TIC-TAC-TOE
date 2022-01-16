@@ -1,6 +1,5 @@
 const PubSub = (() => {
     //create communication between modules
-    
     let Events = {};
 
     function Subscribe(NameOfEvent,fn){
@@ -100,9 +99,8 @@ const startEndModule = (() => {
 
 const playerModule = (() => {
     // take eye on player`s turns and start game 
-    
-    // PubSub.publish("gameEnd",???);
 
+    PubSub.subscribe('gameEnd', fixS)
     PubSub.subscribe('FirstPlayer',game);
     PubSub.subscribe('gameStart', gStart);
     let firstPlayer = '';
@@ -126,6 +124,11 @@ const playerModule = (() => {
         boardModule.squers.forEach( squre => squre.addEventListener('click',operate))
     } 
     
+    function fixS(){
+        boardModule.squers.forEach( squre => squre.removeEventListener('click',operate))
+    }
+
+
     function operate(squre) {
 
         if(squre.target.innerText == ''){
@@ -200,4 +203,3 @@ const regulatorModule = (() => {
         }
     }
 })();
-
