@@ -57,27 +57,44 @@ const startEndModule = (() => {
 
         chosePole.appendChild(xButton);
         chosePole.appendChild(oButton);
-        startButtton.parentElement.appendChild(chosePole);
+        startButtton.parentElement.parentElement.appendChild(chosePole);
 
         xButton.addEventListener('click', () => {
             chosePole.innerHTML = '';
             chosePole.remove();
             PubSub.publish('FirstPlayer','X')
+            PubSub.publish('gameStart','')
         });
 
         oButton.addEventListener('click', () => {
             chosePole.innerHTML = '';
             chosePole.remove();
             PubSub.publish('FirstPlayer','O')
+            PubSub.publish('gameStart','')
         });
 
         startButtton.remove();
     });
 
     function prepareNewGame (data) {
-        console.log(data);
-        //make logic
-        //get Winner
+      document.querySelector('#result_feeld').textContent = `Winner - ${data.Winner}`;
+      document.querySelector('#bF').innerHTML = '';
+      const resetB = document.createElement('button');  
+      resetB.textContent = 'Reset';
+      resetB.classList.add('resetB');
+      document.querySelector('#bF').append(resetB);
+      resetB.addEventListener("click", () => {
+          for(let i = 0; i < 9;i++){
+            data.Arr[i].textContent = '';
+          } 
+          resetB.parentElement.innerHTML = '';
+          resetB.remove()
+          console.log(document.querySelector('#bF'))
+          document.querySelector('#bF').append(startButtton);
+          document.querySelector('#Player1').textContent = 'Player1';
+          document.querySelector('#Player2').textContent = 'Player2';
+          document.querySelector('#result_feeld').textContent = '';
+      })
     }
 })();
 
@@ -87,6 +104,7 @@ const playerModule = (() => {
     // PubSub.publish("gameEnd",???);
 
     PubSub.subscribe('FirstPlayer',game);
+    PubSub.subscribe('gameStart', gStart);
     let firstPlayer = '';
     let currentTurn = 'X';
     let resF =  document.querySelector('#result_feeld');
@@ -103,10 +121,13 @@ const playerModule = (() => {
             firstPlayer = 'O';
         }
     }
-    
-    boardModule.squers.forEach( squre => squre.addEventListener('click',operate))
+
+    function gStart(){
+        boardModule.squers.forEach( squre => squre.addEventListener('click',operate))
+    } 
     
     function operate(squre) {
+
         if(squre.target.innerText == ''){
             if(currentTurn == 'X'){
                 squre.target.innerText = 'X';
@@ -141,20 +162,42 @@ const regulatorModule = (() => {
     }
 
     let checkArr = [];
+    let tieCheck = 0;
 
     function checkResult(data) {
        for(let i = 0; i < 9; i++){
             checkArr[i] = data[i].textContent
        }
        
-       if(checkArr[0] == checkArr[1] && checkArr[1] == checkArr[2] && checkArr[2] == checkArr[0]){
-           console.log(checkArr[0])
-            PubSub.publish('gameEnd', checkArr[1] == FP ? FP : '?');
+       for(let i = 0; i <= 6; i+=3) {
+            if(checkArr[i] == checkArr[i+1] && checkArr[i+1] == checkArr[i+2] && checkArr[i+2] == checkArr[i] && checkArr[i] != ''){
+                PubSub.publish('gameEnd', {Winner : checkArr[i] == FP ? FP : checkArr[i], Arr : data});
+            }
        }
-    }
+       
+       for(let i = 0; i < 3; i += 1) {
+            if(checkArr[i] == checkArr[i+3] && checkArr[i+3] == checkArr[i+6] && checkArr[i+6] == checkArr[i] && checkArr[i] != ''){
+                PubSub.publish('gameEnd', {Winner : checkArr[i] == FP ? FP : checkArr[i], Arr : data});
+            }
+        }
 
-    return {
+        for(let i = 0; i < 3; i += 2) {
+            if(checkArr[i] == checkArr[4] && checkArr[4] == checkArr[8-i] && checkArr[8-i] == checkArr[i] && checkArr[i] != ''){
+                PubSub.publish('gameEnd', {Winner : checkArr[i] == FP ? FP : checkArr[i], Arr : data});
+            }
+        }
         
-    };
+        for(let i = 0; i < 9; i++) {
+            if(checkArr[i] != ''){
+                tieCheck++
+            }
+        }
+
+        if(tieCheck == 9){
+            PubSub.publish('gameEnd',{Winner : 'Tie', Arr : data})
+        }else{
+            tieCheck = 0;
+        }
+    }
 })();
 

@@ -79,3 +79,8 @@ body{
     background-color: lavenderblush;
     border-radius: 10px;
 }
+
+.resetB{
+    margin-top: 50px;
+    min-width: 70px;
+}
